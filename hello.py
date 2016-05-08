@@ -4,7 +4,7 @@ import web
 urls = (
   '/', 'index',
   '/login', 'login',
-  '/(.*)', 'index2'
+  '/upload', 'upload'
 )
 
 
@@ -20,9 +20,17 @@ class index:
 		print(data)
 		return render.index('royluo')
 
-class index2:
-	def GET(self, name):
-		return render.index(name)
+
+class upload:
+	def GET(self):
+		return render.upload()
+
+	def POST(self):
+		x = web.input(myfile={})
+		print(x.myfile.filename)
+		print(x.myfile.value)
+		raise web.seeother('/')
+
 
 class login:
 	def GET(self):
