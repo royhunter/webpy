@@ -3,7 +3,8 @@ import web
 
 urls = (
   '/', 'index',
-  '/login', 'login'
+  '/login', 'login',
+  '/(.*)', 'index2'
 )
 
 
@@ -18,6 +19,10 @@ class index:
 		data = web.data()
 		print(data)
 		return render.index('royluo')
+
+class index2:
+	def GET(self, name):
+		return render.index(name)
 
 class login:
 	def GET(self):
