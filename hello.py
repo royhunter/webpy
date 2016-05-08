@@ -24,6 +24,9 @@ class login:
 		return render.login()
 
 	def POST(self):
+		login = web.input()
+		print(login.user)
+		print(login.pwd)
 		raise web.seeother('/')
 
 
