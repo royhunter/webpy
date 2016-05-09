@@ -2,17 +2,23 @@ import web
 
 
 urls = (
-  '/', 'index',
-  '/login', 'login',
-  '/upload', 'upload'
+  '/', 'Index',
+  '/login', 'Login',
+  '/upload', 'Upload',
+  '/cookie', 'Cookie'
 )
 
 
 render = web.template.render('templates/')
 
-class index:
+class Index:
 	def GET(self):
 		i = web.input(name=None)
+		age = web.cookies().get('age')
+		if None == age:
+			print("cookie not exist")
+		else:
+			print(age)
 		return render.index(i.name)
 
 	def POST(self):
@@ -21,18 +27,21 @@ class index:
 		return render.index('royluo')
 
 
-class upload:
+class Upload:
 	def GET(self):
 		return render.upload()
 
 	def POST(self):
 		x = web.input(myfile={})
-		print(x.myfile.filename)
-		print(x.myfile.value)
-		raise web.seeother('/')
+		filename = x.myfile.filename
+		if 'myfile' in x:
+			fout = open(filename,'w')
+			fout.write(x.myfile.file.read())
+			fout.close()
+		raise web.seeother('/upload')
 
 
-class login:
+class Login:
 	def GET(self):
 		return render.login()
 
@@ -41,6 +50,14 @@ class login:
 		print(login.user)
 		print(login.pwd)
 		raise web.seeother('/')
+
+
+class Cookie:
+	def GET(self):
+		i = web.input(age='25')
+		web.setcookie("age", i.age, 3600)
+		return "Age set in your cookie"
+
 
 
 if __name__ == "__main__":
