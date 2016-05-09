@@ -1,5 +1,7 @@
 import web
-
+import os
+import time
+import hashlib
 
 urls = (
   '/', 'Index',
@@ -8,17 +10,18 @@ urls = (
   '/cookie', 'Cookie'
 )
 
+account = {"royluo":"123456"}
 
+
+app = web.application(urls, globals())
 render = web.template.render('templates/')
+store = web.session.DiskStore('sessions')
+session = web.session.Session(app, store)
+
 
 class Index:
 	def GET(self):
 		i = web.input(name=None)
-		age = web.cookies().get('age')
-		if None == age:
-			print("cookie not exist")
-		else:
-			print(age)
 		return render.index(i.name)
 
 	def POST(self):
@@ -42,14 +45,26 @@ class Upload:
 
 
 class Login:
+	def _generate_session_id(self):
+		session_id = 1
+		return session_id
+
 	def GET(self):
+		print(self._generate_session_id())
 		return render.login()
 
 	def POST(self):
 		login = web.input()
-		print(login.user)
-		print(login.pwd)
-		raise web.seeother('/')
+		username = login.user
+		password = login.passwd
+
+		if username in account:
+			if account[username] == password:
+				raise web.seeother('/')
+			else:
+				raise web.seeother('/login')
+		else:
+			raise web.seeother('/login')
 
 
 class Cookie:
@@ -61,5 +76,4 @@ class Cookie:
 
 
 if __name__ == "__main__":
-	app = web.application(urls, globals())
 	app.run()
