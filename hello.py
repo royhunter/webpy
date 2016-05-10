@@ -3,11 +3,12 @@ import os
 import time
 import hashlib
 
+web.config.debug = False
 urls = (
-  '/', 'Index',
-  '/login', 'Login',
-  '/upload', 'Upload',
-  '/cookie', 'Cookie'
+	'/', 'Index',
+  	'/login', 'Login',
+  	'/upload', 'Upload',
+  	'/reset', 'Reset'
 )
 
 account = {"royluo":"123456"}
@@ -45,13 +46,13 @@ class Upload:
 
 
 class Login:
-	def _generate_session_id(self):
-		session_id = 1
-		return session_id
 
 	def GET(self):
-		print(self._generate_session_id())
-		return render.login()
+		sess_id = web.cookies().get("roysite")
+		if sess_id == None:
+			return render.login()
+		else:
+			raise web.seeother('/')
 
 	def POST(self):
 		login = web.input()
@@ -60,6 +61,9 @@ class Login:
 
 		if username in account:
 			if account[username] == password:
+				session_id = hashlib.md5(password).hexdigest()
+				session['roysite'] = session_id
+				web.setcookie("roysite", session_id, 3600)
 				raise web.seeother('/')
 			else:
 				raise web.seeother('/login')
@@ -67,11 +71,12 @@ class Login:
 			raise web.seeother('/login')
 
 
-class Cookie:
+class Reset:
 	def GET(self):
-		i = web.input(age='25')
-		web.setcookie("age", i.age, 3600)
-		return "Age set in your cookie"
+		session.kill()
+		return "reset ok!"
+
+
 
 
 
