@@ -16,6 +16,16 @@ app = web.application(urls, locals())
 render = web.template.render('templates/')
 session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'islogin': 0})
 
+def logged():
+	if session.islogin == 1:
+		return True
+	else:
+		return False
+
+def login_set():
+	session.islogin = 1
+	return
+
 
 class Index:
 	def GET(self):
@@ -44,7 +54,7 @@ class Upload:
 
 class Login:
 	def GET(self):
-		if session.islogin == 0:
+		if logged():
 			return render.login()
 		else:
 			raise web.seeother('/')
@@ -56,7 +66,7 @@ class Login:
 
 		if username in account:
 			if account[username] == password:
-				session.islogin = 1
+				login_set()
 				raise web.seeother('/')
 			else:
 				raise web.seeother('/login')
