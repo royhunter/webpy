@@ -1,9 +1,7 @@
 import web
-import os
-import time
 import hashlib
-
 web.config.debug = False
+
 urls = (
 	'/', 'Index',
   	'/login', 'Login',
@@ -14,10 +12,9 @@ urls = (
 account = {"royluo":"123456"}
 
 
-app = web.application(urls, globals())
+app = web.application(urls, locals())
 render = web.template.render('templates/')
-store = web.session.DiskStore('sessions')
-session = web.session.Session(app, store)
+session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'islogin': 0})
 
 
 class Index:
@@ -46,10 +43,8 @@ class Upload:
 
 
 class Login:
-
 	def GET(self):
-		sess_id = web.cookies().get("roysite")
-		if sess_id == None:
+		if session.islogin == 0:
 			return render.login()
 		else:
 			raise web.seeother('/')
@@ -61,9 +56,7 @@ class Login:
 
 		if username in account:
 			if account[username] == password:
-				session_id = hashlib.md5(password).hexdigest()
-				session['roysite'] = session_id
-				web.setcookie("roysite", session_id, 3600)
+				session.islogin = 1
 				raise web.seeother('/')
 			else:
 				raise web.seeother('/login')
